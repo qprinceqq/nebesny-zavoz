@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Небесный завоз — грузовые дирижабли в Якутии</title>
+<meta name="description" content="Доставка партий до 16 т дирижаблем в посёлки Якутии без взлётной полосы, вне навигации и зимника. Заявка на пробный рейс.">
+<meta property="og:title" content="Небесный завоз — заявка на пробный рейс">
+<meta property="og:description" content="Партии до 16 т в посёлки без полосы, вне навигации и зимника. Учебный проект ПГУТИ.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cellipse cx='34' cy='24' rx='26' ry='12' fill='%23124a5e'/%3E%3Crect x='26' y='40' width='16' height='12' fill='%23c4510f'/%3E%3Cpath d='M30 36v4M38 36v4' stroke='%23124a5e' stroke-width='3'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Страница предзаказа как грузовая накладная: цифры маршрута моноширинным, форма как заявка на партию.
+   Цвета: морозная синева северного неба и оранжевая сигнальная маркировка контейнера. */
+:root {
+  --ice: #e8f0f3; --paper: #f8fbfc; --ink: #10303d; --dim: #4b6673; --line: #bfd2da;
+  --deep: #124a5e; --on-deep: #f1f8fa; --signal: #c4510f; --on-signal: #ffffff; --soft: #d6e6ec; --ok: #1d6b43; --err: #a2312c;
+  --display: "Unbounded", "Arial Black", Arial, sans-serif; --body: "Golos Text", "Segoe UI", Arial, sans-serif; --mono: "JetBrains Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root {
+  --ice: #0d1f27; --paper: #142933; --ink: #e6f1f5; --dim: #a1b9c4; --line: #2f4a56;
+  --deep: #1a5d75; --on-deep: #f1f8fa; --signal: #ee8a4a; --on-signal: #1a0f07; --soft: #1a3541; --ok: #7fd3a2; --err: #f09b95; color-scheme: dark;
+} }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--ice); color: var(--ink); font: 17px/1.55 var(--body); }
+.band { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 44px; }
+.in { max-width: 1040px; margin: 0 auto; display: grid; gap: 22px; }
+h1, h2 { font-family: var(--display); line-height: 1.12; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(30px, 5.6vw, 54px); font-weight: 700; }
+h2 { font-size: clamp(22px, 3.2vw, 30px); font-weight: 500; }
+h3 { font-size: 17px; font-weight: 600; margin: 0 0 4px; }
+p { margin: 0; max-width: 64ch; }
+a { color: inherit; }
+.tag { font: 500 13px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--signal); }
+.hero { background: var(--deep); color: var(--on-deep); padding-block: 34px 0; }
+.hero .tag { color: var(--on-deep); opacity: .85; }
+.hero p { font-size: 19px; }
+.heroGrid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; align-items: end; }
+.heroText { display: grid; gap: 16px; padding-bottom: 34px; align-content: start; }
+.ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+.cta { display: inline-block; background: var(--signal); color: var(--on-signal); font: 600 16px var(--body); padding: 12px 20px; border-radius: 4px; text-decoration: none; border: 0; cursor: pointer; }
+.cta.ghost { background: transparent; color: var(--on-deep); box-shadow: inset 0 0 0 2px var(--on-deep); }
+.cta:disabled { opacity: .6; cursor: progress; }
+.cta:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 3px solid var(--signal); outline-offset: 2px; }
+.scene { display: block; width: 100%; height: auto; }
+.fig { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-block: 1px solid var(--line); }
+.fig div { padding: 14px 16px 14px 0; display: grid; gap: 2px; align-content: start; }
+.fig b { font: 500 clamp(22px, 3vw, 30px)/1.1 var(--mono); }
+.fig span { font-size: 15px; color: var(--dim); }
+.cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.cols.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.cols > div { min-width: 0; }
+.steps { display: grid; gap: 14px; list-style: none; padding: 0; margin: 0; counter-reset: s; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.steps li { counter-increment: s; display: grid; gap: 4px; align-content: start; min-width: 0; }
+.steps li::before { content: "Шаг " counter(s); font: 500 13px var(--mono); color: var(--signal); }
+.alt { background: var(--paper); }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 16px; }
+th, td { text-align: left; padding: 9px 10px 9px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--dim); font-weight: 500; font-size: 14px; }
+tr.us td { font-weight: 600; }
+td.num { font-family: var(--mono); white-space: nowrap; }
+.pilot { border: 2px dashed var(--signal); border-radius: 6px; padding: 18px 20px; display: grid; gap: 10px; }
+.pilot ul { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
+details { border-bottom: 1px solid var(--line); padding: 10px 0; }
+summary { cursor: pointer; font-weight: 600; }
+details p { margin-top: 6px; }
+.form { background: var(--paper); border: 2px solid var(--deep); border-radius: 6px; padding: 20px; display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: 0; }
+.form .full { grid-column: 1 / -1; }
+label.f { display: grid; gap: 4px; font-size: 15px; font-weight: 500; min-width: 0; }
+input[type=text], input[type=number], select, textarea { width: 100%; font: 400 16px var(--body); padding: 9px 10px; border: 1px solid var(--line); border-radius: 4px; background: var(--ice); color: var(--ink); }
+textarea { min-height: 84px; resize: vertical; }
+fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 6px; min-width: 0; }
+legend { font-size: 15px; font-weight: 500; padding: 0 0 4px; }
+.row { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.opt { display: flex; gap: 9px; align-items: flex-start; font-size: 16px; font-weight: 400; }
+.opt input { margin-top: 5px; flex: none; accent-color: var(--signal); }
+.msg { font-size: 15px; min-height: 22px; }
+.msg.ok { color: var(--ok); font-weight: 600; } .msg.err { color: var(--err); }
+.notice { font-size: 14px; color: var(--dim); }
+footer.band { padding-block: 24px 40px; font-size: 14px; color: var(--dim); }
+@media (max-width: 760px) {
+  .heroGrid, .cols, .cols.four, .steps, .form { grid-template-columns: minmax(0, 1fr); }
+  .fig { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .heroText { padding-bottom: 0; }
+}
+</style>
+</head>
+<body>
+
+<header class="hero band">
+  <div class="in">
+    <div class="heroGrid">
+      <div class="heroText">
+        <span class="tag">Предзаказ · Якутия · пробные рейсы</span>
+        <h1>Небесный завоз</h1>
+        <p>Партия до 16 тонн в посёлок без взлётной полосы — когда навигация закрыта, а зимник ещё не встал. Дирижабль не садится: контейнер опускается на тросах прямо к складу.</p>
+        <div class="ctas">
+          <a class="cta" href="#order">Забронировать пробный рейс</a>
+          <a class="cta ghost" href="#pilot">Условия пробного рейса</a>
+        </div>
+      </div>
+      <svg class="scene" viewBox="0 0 520 330" role="img" aria-label="Дирижабль над посёлком опускает контейнер на тросах">
+        <path d="M0 330 V272 L70 256 L130 270 L205 250 L290 268 L380 246 L455 264 L520 252 V330 Z" fill="#e8f0f3"/>
+        <ellipse cx="270" cy="88" rx="205" ry="64" fill="#f1f8fa"/>
+        <path d="M78 46 L28 22 L44 76 Z M78 130 L28 154 L44 100 Z" fill="#f1f8fa"/>
+        <rect x="200" y="148" width="140" height="26" rx="6" fill="#0c3644"/>
+        <path d="M250 174 V236 M290 174 V236" stroke="#f1f8fa" stroke-width="2"/>
+        <rect x="236" y="234" width="68" height="34" fill="#c4510f"/>
+        <path d="M253 234 V268 M270 234 V268 M287 234 V268" stroke="#f1f8fa" stroke-opacity=".55" stroke-width="2"/>
+        <g fill="#0c3644"><rect x="58" y="240" width="38" height="24"/><path d="M54 240 L77 224 L100 240 Z"/><rect x="116" y="248" width="30" height="20"/><path d="M112 248 L131 234 L150 248 Z"/><rect x="396" y="236" width="42" height="26"/><path d="M392 236 L417 220 L442 236 Z"/></g>
+        <text x="270" y="96" text-anchor="middle" font-family="JetBrains Mono, Consolas, monospace" font-size="17" fill="#124a5e">16 т · до 1500 км</text>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<main>
+<section class="band">
+  <div class="in">
+    <div class="fig">
+      <div><b>16 т</b><span>партия за один рейс</span></div>
+      <div><b>0 м</b><span>взлётной полосы нужно в посёлке</span></div>
+      <div><b>295 ₽/кг</b><span>расчётный тариф</span></div>
+      <div><b>13</b><span>арктических районов Якутии в зоне работы</span></div>
+    </div>
+    <h2>Для кого</h2>
+    <p>Для торгово-логистических компаний и поставщиков завоза, которым нужно привезти товар в посёлки между навигациями, и для подрядчиков вахтовых объектов без дорог и полос.</p>
+    <h2>Что вы получаете</h2>
+    <div class="cols four">
+      <div><h3>Не ждать сезон</h3><p>Срочная партия едет вне навигации и зимника, а не лежит на базе до следующего сезона.</p></div>
+      <div><h3>Доставка без полосы</h3><p>В посёлке нужна только ровная площадка. Контейнер выгружается без посадки.</p></div>
+      <div><h3>Крупная партия</h3><p>До 16 т за рейс: больше, чем берут Ан-26 и Ми-8.</p></div>
+      <div><h3>Понятные сроки</h3><p>Отслеживание рейса и оповещение о погодном окне и времени прибытия.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band alt">
+  <div class="in">
+    <h2>Как это работает</h2>
+    <ol class="steps">
+      <li><h3>Заявка</h3><p>Вы указываете посёлок, вес и срок партии.</p></li>
+      <li><h3>Расчёт</h3><p>За два рабочих дня присылаем расчёт и сравнение с вашей текущей доставкой.</p></li>
+      <li><h3>Погрузка в порту</h3><p>Груз идёт в съёмных контейнерах от речного порта или базы.</p></li>
+      <li><h3>Выгрузка</h3><p>Контейнер опускается на площадку у склада, вы подписываете акт.</p></li>
+    </ol>
+    <h2>Сравнение способов доставки</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>Способ</th><th>Загрузка за рейс</th><th>Цена за кг</th><th>Что нужно на месте</th></tr></thead>
+      <tbody>
+        <tr><td>Самолёты Ан-24 и Ан-26</td><td class="num">3,5–4,5 т</td><td class="num">≈309 ₽ (215–390)¹</td><td>Взлётная полоса</td></tr>
+        <tr><td>Вертолёт Ми-8МТВ</td><td class="num">до 3 т</td><td class="num">≈430 ₽²</td><td>Вертолётная площадка</td></tr>
+        <tr><td>Вертолёт Ми-26</td><td class="num">до 20 т</td><td class="num">≈250 ₽²</td><td>Площадка, редкий борт</td></tr>
+        <tr class="us"><td>Небесный завоз (план)</td><td class="num">до 16 т</td><td class="num">295 ₽</td><td>Ровная площадка для контейнера</td></tr>
+      </tbody>
+    </table></div>
+    <p class="notice">¹ Тарифы «Полярных авиалиний» из Якутска до девяти арктических пунктов, с НДС. ² Пересчёт почасовой ставки оператора (185 и 800 тыс. ₽ в час без НДС) на маршрут 800 км с обратным перелётом без груза при полной загрузке. Данные Небесного завоза проектные.</p>
+  </div>
+</section>
+
+<section class="band" id="pilot">
+  <div class="in">
+    <h2>Условия пробного рейса</h2>
+    <div class="pilot">
+      <p>Пробный рейс выполняется на аппарате около 5 т по одному маршруту от речного порта до посёлка. Условия составлены по итогам интервью с логистами и руководителями ТЛЦ:</p>
+      <ul>
+        <li><b>оплата после доставки</b> по расчётному тарифу, без предоплаты;</li>
+        <li><b>страхование груза</b> за счёт перевозчика;</li>
+        <li><b>резервная доставка авиацией</b>, если рейс сорвался из-за погоды;</li>
+        <li><b>контейнер под погрузчик ТЛЦ</b> и время прибытия, согласованное заранее.</li>
+      </ul>
+    </div>
+    <h2>Что уже сделано</h2>
+    <div class="cols">
+      <div><h3>Исследование заказчиков</h3><p>Опрос 7 человек: логисты, руководители, вахтовик, житель и работник транспорта. Интерес к услуге проявили 4 из 5 потенциальных заказчиков.</p></div>
+      <div><h3>Расчёт рынка и экономики</h3><p>Целевой рынок 2,15–3,10 млрд ₽ в год. Точка безубыточности одного аппарата — 1566 т в год, проверены три сценария.</p></div>
+      <div><h3>Бизнес-модель</h3><p>Определены маршрутная схема от речных портов, формат съёмных контейнеров, каналы продаж и партнёры.</p></div>
+    </div>
+    <h2>Команда</h2>
+    <div class="cols">
+      <div><h3>Р.В. Дубровин</h3><p>Сооснователь. Бизнес-модель, бюджет и переговоры с производителями аппаратов.</p></div>
+      <div><h3>К.Ю. Храмов</h3><p>Сооснователь. Цифровой сервис заявок, отслеживание рейсов и продукт.</p></div>
+      <div><h3>Планируем привлечь</h3><p>Специалиста по авиационной эксплуатации и специалиста по логистике и продажам в Якутии.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band alt">
+  <div class="in">
+    <h2>Вопросы и ответы</h2>
+    <div>
+      <details><summary>Когда начнутся рейсы?</summary><p>Сроки зависят от поставки аппарата и получения допуска к полётам. Заявки помогают выбрать первый маршрут и договориться с производителем, поэтому пробный рейс получат первые заказчики.</p></details>
+      <details><summary>Что будет при плохой погоде?</summary><p>Рейс переносится на ближайшее погодное окно, вы заранее получаете оповещение. Если срок критичен, груз передаётся авиации за счёт перевозчика.</p></details>
+      <details><summary>Безопасно ли это?</summary><p>Аппарат жёсткой конструкции наполнен гелием — негорючим газом. Груз страхуется на всё время рейса.</p></details>
+      <details><summary>Что нужно в посёлке?</summary><p>Ровная площадка около 20×20 м рядом со складом и сотрудник, который примет контейнер. Полоса и причальная мачта не нужны.</p></details>
+      <details><summary>Обязывает ли заявка к чему-то?</summary><p>Нет. Заявка и бронь не являются договором, оплата сейчас не нужна. Письмо о намерениях подписывается отдельно, если вы готовы.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="order">
+  <div class="in">
+    <h2>Заявка на пробный рейс</h2>
+    <p>Флота пока нет: мы собираем заявки, чтобы выбрать первый маршрут. Ответим и пришлём расчёт в течение двух рабочих дней.</p>
+    <form class="form" id="form" novalidate>
+      <label class="f">Компания<input type="text" id="company" required maxlength="120" autocomplete="organization"></label>
+      <label class="f">Контактное лицо<input type="text" id="person" required maxlength="120" autocomplete="name"></label>
+      <label class="f">Телефон или e-mail<input type="text" id="contact" required maxlength="120"></label>
+      <label class="f">Район
+        <select id="district" required>
+          <option value="">Выберите</option>
+          <option>Абыйский</option><option>Аллаиховский</option><option>Анабарский</option><option>Булунский</option><option>Верхнеколымский</option><option>Верхоянский</option><option>Жиганский</option><option>Момский</option><option>Нижнеколымский</option><option>Оленёкский</option><option>Среднеколымский</option><option>Усть-Янский</option><option>Эвено-Бытантайский</option><option>Другой район Якутии</option>
+        </select>
+      </label>
+      <label class="f">Населённый пункт<input type="text" id="place" required maxlength="80"></label>
+      <fieldset>
+        <legend>Есть ли в посёлке взлётная полоса?</legend>
+        <div class="row">
+          <label class="opt"><input type="radio" name="strip" value="полосы нет"><span>Нет</span></label>
+          <label class="opt"><input type="radio" name="strip" value="полоса есть"><span>Есть</span></label>
+          <label class="opt"><input type="radio" name="strip" value="не знаю про полосу"><span>Не знаю</span></label>
+        </div>
+      </fieldset>
+      <label class="f">Вес партии, т<input type="number" id="weight" required min="0.1" max="16" step="0.1" inputmode="decimal"></label>
+      <label class="f">Когда нужна доставка
+        <select id="when" required>
+          <option value="">Выберите</option>
+          <option>Весна</option><option>Лето</option><option>Осень</option><option>Зима</option><option>Срок пока не определён</option>
+        </select>
+      </label>
+      <fieldset class="full">
+        <legend>Что вы готовы сделать сейчас</legend>
+        <label class="opt"><input type="radio" name="commit" value="Забронировать партию на пробный рейс"><span>Забронировать партию на пробный рейс</span></label>
+        <label class="opt"><input type="radio" name="commit" value="Подписать письмо о намерениях"><span>Подписать письмо о намерениях</span></label>
+        <label class="opt"><input type="radio" name="commit" value="Получить расчёт для нашего маршрута"><span>Получить расчёт для нашего маршрута</span></label>
+      </fieldset>
+      <label class="f full">Комментарий: что везёте, как доставляете сейчас<textarea id="comment" maxlength="1000"></textarea></label>
+      <label class="opt full"><input type="checkbox" id="consent"><span>Согласен, что указанные контакты используются только для ответа на эту заявку</span></label>
+      <div class="full" style="display:grid;gap:8px">
+        <button class="cta" id="send" type="submit">Отправить заявку</button>
+        <div class="msg" id="msg" role="status" aria-live="polite"></div>
+      </div>
+    </form>
+    <p class="notice">Заявка не является договором и ни к чему не обязывает. Сроки первых рейсов зависят от поставки аппарата и допуска к полётам.</p>
+  </div>
+</section>
+</main>
+
+<footer class="band">
+  <div class="in"><p>Небесный завоз — учебный проект по дисциплине «Технологии развития цифровых продуктов», ПГУТИ, Самара, 2026. Услуга пока не оказывается. Связаться с командой можно через форму заявки.</p></div>
+</footer>
+
+<script>
+// Заявки отправляются в Google Форму. FORM_ID и номера полей entry.* берутся из опубликованной формы.
+const GOOGLE_FORM = {
+  id: '',
+  fields: { company: '', person: '', contact: '', place: '', weight: '', when: '', commit: '', comment: '' },
+};
+const $ = (id) => document.getElementById(id);
+const say = (t, cls) => { const m = $('msg'); m.textContent = t; m.className = 'msg ' + (cls || ''); };
+$('form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = $('form');
+  const commit = f.querySelector('input[name=commit]:checked');
+  const strip = f.querySelector('input[name=strip]:checked');
+  const weight = parseFloat(String($('weight').value).replace(',', '.'));
+  const text = ['company', 'person', 'contact', 'place'].every((k) => $(k).value.trim());
+  if (!text || !$('district').value || !$('when').value) return say('Заполните компанию, контакт, район, населённый пункт и срок.', 'err');
+  if (!(weight > 0 && weight <= 16)) return say('Укажите вес партии от 0,1 до 16 т.', 'err');
+  if (!commit) return say('Выберите, что вы готовы сделать сейчас.', 'err');
+  if (!$('consent').checked) return say('Подтвердите согласие на использование контактов.', 'err');
+  if (!GOOGLE_FORM.id) return say('Приём заявок ещё не подключён. Попробуйте позже.', 'err');
+  const values = {
+    company: $('company').value.trim(), person: $('person').value.trim(), contact: $('contact').value.trim(),
+    place: `${$('district').value} район, ${$('place').value.trim()}, ${strip ? strip.value : 'про полосу не указано'}`,
+    weight: String(weight).replace('.', ','), when: $('when').value, commit: commit.value, comment: $('comment').value.trim(),
+  };
+  const body = new URLSearchParams();
+  for (const k in values) if (GOOGLE_FORM.fields[k]) body.append(GOOGLE_FORM.fields[k], values[k]);
+  const btn = $('send'); btn.disabled = true; say('Отправляю…');
+  try {
+    await fetch(`https://docs.google.com/forms/d/e/${GOOGLE_FORM.id}/formResponse`, { method: 'POST', mode: 'no-cors', body });
+    f.reset(); say('Заявка отправлена. Ответим в течение двух рабочих дней. Спасибо!', 'ok');
+  } catch (err) {
+    say('Не удалось отправить: проверьте подключение к интернету. Данные остались в форме.', 'err');
+  }
+  btn.disabled = false;
+});
+</script>
+</body>
+</html>
