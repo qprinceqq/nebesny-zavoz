@@ -258,8 +258,11 @@ footer.band { padding-block: 24px 40px; font-size: 14px; color: var(--dim); }
 <script>
 // Заявки отправляются в Google Форму. FORM_ID и номера полей entry.* берутся из опубликованной формы.
 const GOOGLE_FORM = {
-  id: '',
-  fields: { company: '', person: '', contact: '', place: '', weight: '', when: '', commit: '', comment: '' },
+  id: '1FAIpQLSe4ZgZoAnEy-ZD5R1CG4z758cOzBe5WI_If7nXg1cK28xzPXQ',
+  fields: {
+    company: 'entry.1891318709', person: 'entry.1276646825', contact: 'entry.1568160456', place: 'entry.922930990',
+    weight: 'entry.1021530223', when: 'entry.1755774739', commit: 'entry.1129181708', comment: 'entry.1236049046',
+  },
 };
 const $ = (id) => document.getElementById(id);
 const say = (t, cls) => { const m = $('msg'); m.textContent = t; m.className = 'msg ' + (cls || ''); };
